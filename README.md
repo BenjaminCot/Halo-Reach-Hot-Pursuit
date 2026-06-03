@@ -6,6 +6,7 @@ A repo for map and game variants pertaining to Hot Pursuit for Halo Reach.
 - [GameType Files](#gametype-files)
 - [How to Read/Edit Map Files](#how-to-readedit-map-files)
 - [How to Read/Edit GameType Files](#how-to-readedit-gametype-files)
+- [Credit](#credit-anchor-point)
 - [License](#license-anchor-point)
 # Map Files
 Inside the Map Files Folder contains a comprehensive list of every Hot Pursuit map (.mvar file) for Halo Reach that we have so far.
@@ -16,5 +17,7 @@ The GameType Files are all different versions/variants of Hot Pursuit, which are
 In terms of editing the contents of any .mvar file, this can be done using forge mode in Halo MCC's game client. You can also use Soptive's [**MVAR Studio**](https://github.com/Sopitive/MapVariantEditor) to access a deeper level of modification of these files, that isn't always possible in the in-game Forge menu. Additionally, to read and manage the large number of map variants in this repo, you can also use my [**MVAR Viewer**](https://github.com/BenjaminCot/HaloMCCReach-mvar-viewer) which is designed to view and manage map variant files en masse opposed to one at at time. The MVAR Viewer will also allow you to view the randomly named files with their actual titles as they appear in-game.
 # How to Read/Edit GameType Files
 To read and edit GameType files, most of the modifications that users need are accessible in-game using the custom game menus. If you wish to delve deeper or actually write/modify your own code, it is recommended to use DavidJCobb's [ReachVariantEditor](https://github.com/DavidJCobb/ReachVariantEditor) which allows deeper customisation of each gametypes settings, as well as direct editing of the code itself, which isn't possible within the game.
+# Credit <a name="credit-anchor-point"></a>
+Credit to all the wonderful map creators who have helped us build up over 250 different maps for the community. Also credit to those who worked on the code for Hot Pursuit before me: Karly & Dummy Dragon123.
 # License <a name="license-anchor-point"></a>
 This is licensed under [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/). Note: use of these files is also subject to the [Halo: MCC EULA](https://content.halocdn.com/media/Default/games/Halo-Master-Chief-Collection/EULAs/mcc_eula_en-7c6c521ed09040bfa67de0488bed5004.pdf), which prohibits commercial use.
