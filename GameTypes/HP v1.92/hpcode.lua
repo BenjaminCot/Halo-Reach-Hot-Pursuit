@@ -1,4 +1,6 @@
-
+-- No comments sadly,
+-- This was decompiled from the release gametype,
+-- most of the code in here is also in v1.95 which does have comments
 declare global.number[0] with network priority low
 declare global.number[1] with network priority local
 declare global.number[2] with network priority low
