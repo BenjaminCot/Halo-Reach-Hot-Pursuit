@@ -5,42 +5,36 @@
 
 -- Variable declaration
 --This could be cleaned up by using temporaries
-declare global.number[0] with network priority low -- Last man standing flag
-declare global.number[2] with network priority low -- used for 330x scaling
-declare global.number[3] with network priority local -- Reusable, currently used 
-                                                     -- for various calculations
-declare global.number[4] with network priority local -- Player count tracker
-declare global.number[5] with network priority low -- Cop count
-declare global.number[6] with network priority low -- Robber count
-declare global.number[7] = 0 -- used for 330x scaling
-declare global.number[8] = 1 -- sequential number counter for assigning 
-                             -- IDs to vehicles and extra seats
-declare global.number[9] -- UNUSED
-declare global.object[1] with network priority low -- reference for attached vehicles
-declare global.object[2] with network priority low -- Identify the players current vehicle (swap to temp?)
-declare global.object[3] with network priority low -- Identify other players in the same 
-                                                   -- vehicle as global.object[2]
-declare global.object[4] with network priority low -- test
+declare global.number[0] with network priority low    -- Last man standing flag
+declare global.number[2] with network priority low    -- used for 330x scaling
+declare global.number[3] with network priority local  -- Reusable, currently used for various calculations
+declare global.number[4] with network priority local  -- Player count tracker
+declare global.number[5] with network priority low    -- Cop count
+declare global.number[6] with network priority low    -- Robber count
+declare global.number[7] = 0					      -- used for 330x scaling
+declare global.number[8] = 1                          -- sequential number counter for assigning IDs to vehicles and extra seats
+declare global.number[9]                              -- UNUSED
+declare global.object[1] with network priority low    -- reference for attached vehicles
+declare global.object[2] with network priority low    -- Identify the players current vehicle (swap to temp?)
+declare global.object[3] with network priority low    -- Identify other players in the same vehicle as global.object[2]
+declare global.object[4] with network priority low    -- test
 declare global.object[5] with network priority low
-declare object.number[0] with network priority low -- flag for whether or not a vehicle 
-                                                   -- has anything attached to it
+declare object.number[0] with network priority low    -- flag for whether or not a vehicle has anything attached to it
 declare object.number[1] with network priority low    
-declare object.number[2] with network priority low -- Persistant ID to link an extra 
-                                                   -- vehicle seat with its vehicle
-declare global.player[0] with network priority local -- Temp player reference (victim) (make temp?)
-declare global.player[1] with network priority local -- Temp player reference (killer) (make temp?)
-declare global.player[2] with network priority low -- Last man standing player reference
-declare global.timer[1] = 10 -- Round end check delay timer'
-declare global.timer[2] = 18 -- time in seconds before robbers get grenades
-declare player.number[0] with network priority low -- Infection status 
-                                                   -- (0=survivor/robber, 1=infected/cop)
+declare object.number[2] with network priority low    -- Persistant ID to link an extra vehicle seat with its vehicle
+declare global.player[0] with network priority local  -- Temp player reference (victim) (make temp?)
+declare global.player[1] with network priority local  -- Temp player reference (killer) (make temp?)
+declare global.player[2] with network priority low    -- Last man standing player reference
+declare global.timer[1] = 10                          -- Round end check delay timer'
+declare global.timer[2] = 18					      -- time in seconds before robbers are given grenades
+declare player.number[0] with network priority low    -- Infection status (0=survivor/robber, 1=infected/cop)
 declare player.number[2] with network priority low
-declare player.number[1] with network priority low -- Last man standing flag for this player
-declare player.number[3] with network priority low -- Round announcement tracker
-declare player.number[4] with network priority low -- Distance to last man (in feet)
-declare player.number[5] -- flag that indicates if grenades have been given
-declare player.number[6] -- extra seats driver flag
-declare player.timer[2] = 1 -- not a clue what this does
+declare player.number[1] with network priority low    -- Last man standing flag for this player
+declare player.number[3] with network priority low    -- Round announcement tracker
+declare player.number[4] with network priority low    -- Distance to last man (in feet)
+declare player.number[5]							  -- flag that indicates if grenades have been given
+declare player.number[6]                              -- extra seats driver flag
+declare player.timer[2] = 1                           -- not a clue what this does
 
 
 -- ALIASES
@@ -48,21 +42,20 @@ alias client_ID = 0
 
 alias resizing_primed = 1
 alias resizing_finished = 2
-alias has_resized = object.number[1] -- local priority; tracks scale state per object
-alias scale_anchor = object.object[0] -- the prop this object is attached to for scaling
+alias has_resized = object.number[1]          -- local priority; tracks scale state per object
+alias scale_anchor = object.object[0]         -- the prop this object is attached to for scaling
 
-alias local_tick_counter = global.number[7] -- local; increments each frame on local block
-alias host_indicator = global.number[0] -- local; 1 on host, 0 on clients
+alias local_tick_counter = global.number[7]   -- local; increments each frame on local block
+alias host_indicator = global.number[0]       -- local; 1 on host, 0 on clients
 
-alias cumulative_total = global.number[2] -- local; running total in exponential scale loop
-alias recursion_count = global.number[9] -- local; iteration counter for scale recursion
-alias three_percent = global.number[10] -- local; ~3% correction per scale iteration
-alias point_four_percent = global.number[11] -- local; ~0.44% fine correction per scale iteration
+alias cumulative_total = global.number[2]     -- local; running total in exponential scale loop
+alias recursion_count = global.number[9]      -- local; iteration counter for scale recursion
+alias three_percent = global.number[10]       -- local; ~3% correction per scale iteration
+alias point_four_percent = global.number[11]  -- local; ~0.44% fine correction per scale iteration
 
 alias grenade_timer = global.timer[2] --timer for delay before robbers are given grenades
 
-alias id_counter = global.number[8] -- numerical counter for assigning IDs 
-                                    -- to vehicles and extra seats
+alias id_counter = global.number[8] -- numerical counter for assigning IDs to vehicles and extra seats
 alias attached_id = object.number[2] -- object specific storage for numerical IDs
 
 
@@ -378,133 +371,94 @@ end
 -- ON LOCAL BLOCK
 -- Part 1: Scale anchors | Part 2: Apply scale | Part 3: Speedometer
 -- ==================================================================
-
 on local: do
-   for each object do
-      if current_object.number[4] == 1 then
-         current_object.set_scale(1)
+
+   local_tick_counter += 1
+
+   -- ---- PART 1: CREATE SCALE ANCHORS ----
+   for each object with label "scale" do
+      if current_object.team == team[4] or current_object.team == team[2] then
+         current_object.set_invincibility(1)
+         if current_object.scale_anchor == no_object then
+            current_object.scale_anchor = current_object.place_between_me_and(current_object, flag_stand, 0)
+            current_object.scale_anchor.set_scale(1)
+            if current_object.team == team[2] then
+               current_object.scale_anchor.delete()
+               current_object.scale_anchor = current_object.place_between_me_and(current_object, heavy_barrier, 0)
+               current_object.scale_anchor.set_scale(50)
+            end
+         end
+      end
+      if current_object.team == team[3] then
+         alias sequence_object = global.object[8]
+         sequence_object = current_object
+         for each object with label "scale" do
+            if sequence_object.shape_contains(current_object) or sequence_object == current_object then
+               current_object.set_hidden(1)
+               if host_indicator == client_ID then
+                  current_object.set_hidden(0)
+                  if current_object.scale_anchor == no_object then
+                     current_object.scale_anchor = current_object.place_between_me_and(current_object, sound_emitter_alarm_2, 0)
+                  end
+               end
+            end
+         end
       end
    end
 
-   global.number[7] += 1
+   -- ---- PART 2: APPLY SCALE ----
    for each object with label "scale" do
-      inline: if current_object.team == team[4] or current_object.team == team[2] then 
-         current_object.set_invincibility(1)
-         if current_object.object[0] == no_object then 
-            current_object.object[0] = current_object.place_between_me_and(current_object, flag_stand, 0)
-            current_object.object[0].set_scale(1)
-            if current_object.team == team[2] then 
-               current_object.object[0].delete()
-               current_object.object[0] = current_object.place_between_me_and(current_object, heavy_barrier, 0)
-               current_object.object[0].set_scale(50)
-            end
-         end
+      alias resized_object = current_object
+      alias sequence_object = current_object
+
+      if resized_object.has_resized == 0 and local_tick_counter > 10 and not resized_object.shape_contains(resized_object) or resized_object.team == team[3] then
+         resized_object.has_resized = resizing_primed
       end
-      if current_object.team == team[3] then 
-         global.object[8] = current_object
-         for each object with label "scale" do
-            if global.object[8].shape_contains(current_object) or global.object[8] == current_object then 
-               current_object.set_hidden(true)
-               if global.number[0] == 0 then 
-                  current_object.set_hidden(false)
-                  if current_object.object[0] == no_object then 
-                     current_object.object[0] = current_object.place_between_me_and(current_object, sound_emitter_alarm_2, 0)
+      if resized_object.has_resized == resizing_primed or local_tick_counter <= 10 then
+         if resized_object.has_resized == resizing_primed then
+            resized_object.has_resized = resizing_finished
+         end
+         if resized_object.team != team[3] then
+            resized_object.set_shape(cylinder, 100, 100, 100)
+         end
+         cumulative_total = 100
+         recursion_count = sequence_object.spawn_sequence
+         if sequence_object.spawn_sequence < 0 then
+            recursion_count *= 5
+            cumulative_total += recursion_count
+            if sequence_object.spawn_sequence <= -20 then
+               recursion_count = sequence_object.spawn_sequence
+               recursion_count += 201
+               if sequence_object.spawn_sequence == -20 then
+                  cumulative_total = 1
+                  if resized_object.team != team[4] then
+                     resized_object.set_hidden(true)
                   end
                end
             end
          end
-      end
-   end
-   for each object with label "scale" do
-      inline: if current_object.number[1] == 0 and global.number[7] > 10 and not current_object.shape_contains(current_object) or current_object.team == team[3] then 
-         current_object.number[1] = 1
-      end
-      if current_object.number[1] == 1 or global.number[7] <= 10 then 
-         inline: if current_object.number[1] == 1 then 
-            current_object.number[1] = 2
-         end
-         inline: if current_object.team != team[3] then 
-            current_object.set_shape(cylinder, 100, 100, 100)
-         end
-         global.number[2] = 100
-         global.number[9] = current_object.spawn_sequence
-         inline: if current_object.spawn_sequence < 0 then 
-            global.number[9] *= 5
-            global.number[2] += global.number[9]
-            if current_object.spawn_sequence <= -20 then 
-               global.number[9] = current_object.spawn_sequence
-               global.number[9] += 201
-               if current_object.spawn_sequence == -20 then 
-                  global.number[2] = 1
-                  if current_object.team != team[4] then 
-                     current_object.set_hidden(true)
-                  end
-               end
-            end
-         end
-         inline: if current_object.spawn_sequence < -20 or current_object.spawn_sequence > 0 then 
-            global.number[2] = 100
-            inline: if current_object.team == team[0] then 
-               global.number[2] = 32732
+         if sequence_object.spawn_sequence < -20 or sequence_object.spawn_sequence > 0 then
+            cumulative_total = 100
+            if sequence_object.team == team[0] then
+               cumulative_total = 32732
             end
             exponential_scale_330x()
          end
-         current_object.detach()
-         current_object.set_scale(global.number[2])
-         current_object.copy_rotation_from(current_object, false)
-         current_object.attach_to(current_object.object[0], 0, 0, 0, relative)
+         resized_object.detach()
+         resized_object.set_scale(cumulative_total)
+         resized_object.copy_rotation_from(resized_object, false)
+         resized_object.attach_to(resized_object.scale_anchor, 0, 0, 0, relative)
       end
    end
+
+   -- ---- PLAYER SPEED CALCULATION ----
+   
+   -- 1 feet per second = 0.68mph
    for each player do
       current_player.number[2] = current_player.biped.get_speed()
       current_player.number[2] *= 17
       current_player.number[2] /= 25
       current_player.number[2] &= 4095
    end
-end
 
-on init: do
-   global.number[9] = 1
 end
---======EXTRA SEAT CODE=======--
-alias this_warthog = allocate temporary object
-alias flagstand = allocate temporary object
-alias back_seat_item = allocate temporary object
-alias distance = allocate temporary number
-
-function add_warthog_back_seat()
-  back_seat_item = this_warthog.place_at_me(covenant_power_core, none, none, 0, 0, 0, none)
-  back_seat_item.attach_to(this_warthog, -10, 0, 5, relative) -- attach item to anchor --back_seat_item.attach_to(flagstand, -10, 0, 5, relative)
-  back_seat_item.set_scale(1) --scale to 1% size to hide the object
-  back_seat_item.attached_id = this_warthog.attached_id
-end
-
--- Identify scout/transport warthogs separately from other types of warthogs.
-for each object do
-   -- Checks for warthogs that don't have an attachment ID (no objects are attached to it)
-   if current_object.is_of_type(warthog) and current_object.attached_id == 0 then 
-      this_warthog = current_object
-      for each object do
-	     -- Checks if the selected warthog has a turret and marks it if it doesn't
-         if current_object.is_of_type(warthog_turret) or current_object.is_of_type(warthog_turret_gauss) or current_object.is_of_type(warthog_turret_rocket) then 
-            distance = current_object.get_distance_to(this_warthog)
-            if distance < 1 then 
-			   this_warthog.attached_id = -1
-            end
-			if distance > 1 then 
-			   this_warthog.attached_id = id_counter -- add an attachment ID
-			   id_counter += 1 -- increment id counter
-			   -- add extra seats to vehicle
-			   -- add the flagstand anchor for attached seats
-			   flagstand = this_warthog.place_at_me(flag_stand, none, none, 0, 0, 0, none)
-			   flagstand.attached_id = this_warthog.attached_id -- assign same number ID as warthog
-			   flagstand.attach_to(this_warthog, 0, 0, 0, relative) -- attach anchor to warthog
-			   flagstand.set_scale(1) -- set to 1% of it's original size (hide the anchor) (is it possible to make it invisible instead?)
-			   add_warthog_back_seat()
-            end
-         end
-      end
-   end
-end
-
--- Flag stand anchor isnt even needed lollll
