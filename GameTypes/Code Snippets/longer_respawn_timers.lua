@@ -17,9 +17,9 @@ alias id_counter = global.number[10]
 
 -- use these to change the respawn (in seconds) time of each weapon
 -- remember that it takes +30 seconds for the weapon to despawn, before this timer starts
-alias spartan_laser_respawn_time = 270
-alias sniper_rifle_respawn_time = 270
-alias rocket_launcher_respawn_time = 270
+alias spartan_laser_respawn_time = 10
+alias sniper_rifle_respawn_time = 10
+alias rocket_launcher_respawn_time = 10
 
 -- these should be fine unless other hill markers also use this number
 declare object.timer[0] = spartan_laser_respawn_time
@@ -106,8 +106,8 @@ for each object with label "spawn_spartan_laser" do
   if weapon_spawn_point.spartan_laser_timer.is_zero() then
     alias weapon = allocate temporary object
 	weapon = weapon_spawn_point.place_at_me(spartan_laser, none, none, 0, 0, 0, none)
-	weapon_spawn_point.script_spawned_weapon_id = id_counter
-    weapon.script_spawned_weapon_id = id_counter
+	-- re-use the spawn point's existing ID, it never changed
+	weapon.script_spawned_weapon_id = spawn_point_id
   end
 end
 
@@ -124,11 +124,11 @@ for each object with label "spawn_sniper_rifle" do
 	  weapon_spawn_point.sniper_rifle_timer.reset()
 	end
   end
-  if weapon_spawn_point.spartan_laser_timer.is_zero() then
+  if weapon_spawn_point.sniper_rifle_timer.is_zero() then
     alias weapon = allocate temporary object
 	weapon = weapon_spawn_point.place_at_me(sniper_rifle, none, none, 0, 0, 0, none)
-	weapon_spawn_point.script_spawned_weapon_id = id_counter
-    weapon.script_spawned_weapon_id = id_counter
+	-- re-use the spawn point's existing ID, it never changed
+	weapon.script_spawned_weapon_id = spawn_point_id
   end
 end
 
@@ -137,7 +137,7 @@ for each object with label "spawn_rocket_launcher" do
   alias weapon_spawn_point = allocate temporary object
   weapon_spawn_point = current_object
   spawn_point_id = current_object.script_spawned_weapon_id
-  weapon_spawn_point.sniper_rifle_timer.set_rate(-100%)
+  weapon_spawn_point.rocket_launcher_timer.set_rate(-100%)
   -- check if the spawned weapon is still spawned in
   for each object do
     if current_object.is_of_type(rocket_launcher) and current_object.script_spawned_weapon_id == spawn_point_id then
@@ -148,10 +148,7 @@ for each object with label "spawn_rocket_launcher" do
   if weapon_spawn_point.rocket_launcher_timer.is_zero() then
     alias weapon = allocate temporary object
 	weapon = weapon_spawn_point.place_at_me(rocket_launcher, none, none, 0, 0, 0, none)
-	weapon_spawn_point.script_spawned_weapon_id = id_counter
-    weapon.script_spawned_weapon_id = id_counter
+	-- re-use the spawn point's existing ID, it never changed
+	weapon.script_spawned_weapon_id = spawn_point_id
   end
 end
-
-
-
