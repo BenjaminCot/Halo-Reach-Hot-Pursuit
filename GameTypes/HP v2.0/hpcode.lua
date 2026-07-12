@@ -8,7 +8,7 @@ Cadence7w7: Extra Seats
 Dummy Dragon123: Falcon Nerf, Status HUD, Last man standing distance calculator
                  Team-balancing code
 Karly: Extra Seats
-Rabids MagicMan: Creator of the 330x Scaling that this gametype uses
+TrustySn00ze: Creator of the 330x Scaling that this gametype uses
 NukeOhio: Speedometer
 
 The code for this gametype makes a good faith effort to follow 
