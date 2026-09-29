@@ -1,4 +1,17 @@
--- Cursed Pursuit
+--[[
+Cursed Pursuit 2026
+Authors: (and the work that they've done)
+Demonatorpro: No scripting, but he created the original Hot Pursuit gametype.
+Dummy Dragon123: Falcon Nerf, Status HUD, Last man standing distance calculator
+                 Team-balancing code
+NukeOhio: Speedometer
+Benjamin Cottrill/Ma7ter Chief: Scorpion & Wraith Nerf, Random Weapons, Random
+                                Vehicles, Player Teleporting,
+								Random Player/Vehicle Scaling, Bullrun
+								Mode.
+--]]
+
+
 -- This can be cleaned up with use of temporaries
 declare global.number[0] with network priority low -- lms flag, not reusable
 declare global.number[1] with network priority low -- Counter for number of occupants in a vehicle
